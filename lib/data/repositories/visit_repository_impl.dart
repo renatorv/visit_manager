@@ -1,10 +1,10 @@
 import '../../domain/entities/visit.dart';
 import '../../domain/repositories/visit_repository.dart';
-import '../datasources/visit_local_datasource.dart';
+import '../datasources/visit_remote_datasource.dart';
 import '../models/visit_model.dart';
 
 class VisitRepositoryImpl implements VisitRepository {
-  final VisitLocalDataSource dataSource;
+  final VisitRemoteDataSource dataSource;
 
   VisitRepositoryImpl(this.dataSource);
 
@@ -25,8 +25,4 @@ class VisitRepositoryImpl implements VisitRepository {
     await dataSource.updateVisit(model);
   }
 
-  @override
-  Future<void> deleteVisit(int id) async {
-    await dataSource.deleteVisit(id);
-  }
 }

@@ -138,171 +138,117 @@ class _VisitCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
+      shape: RoundedRectangleBorder(
         borderRadius: const BorderRadius.all(Radius.circular(12)),
-        onTap: () async {
-          await context.push(AppRouter.editVisit, extra: visit);
-          if (context.mounted) {
-            context.read<VisitCubit>().loadVisits();
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: AppTheme.primaryColor,
-                    radius: 20,
-                    child: Icon(Icons.person, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          visit.visitedPersonName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.5), width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: AppTheme.primaryColor,
+                  radius: 20,
+                  child: Icon(Icons.person, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        visit.visitedPersonName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                        Text(
-                          'Visitante: ${visit.visitorName}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Visitante: ${visit.visitorName}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
                         ),
-                      ],
-                    ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  if (visit.visitAgain)
-                    const _StatusChip(
-                      label: 'Revisitar',
-                      color: AppTheme.primaryColor,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    await context.push(AppRouter.editVisit, extra: visit);
+                    if (context.mounted) {
+                      context.read<VisitCubit>().loadVisits();
+                    }
+                  },
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  label: const Text('Editar'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _InfoRow(
+              icon: Icons.calendar_today,
+              text: 'Visita em: ${dateFormat.format(visit.visitDate)}',
+            ),
+            if (visit.description.isNotEmpty) ...[
+              const SizedBox(height: 4),
               _InfoRow(
-                icon: Icons.calendar_today,
-                text: 'Visita em: ${dateFormat.format(visit.visitDate)}',
-              ),
-              if (visit.description.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                _InfoRow(
-                  icon: Icons.notes,
-                  text: visit.description,
-                  maxLines: 2,
-                ),
-              ],
-              if (visit.visitAgain && visit.nextVisitDate != null) ...[
-                const SizedBox(height: 4),
-                _InfoRow(
-                  icon: Icons.event_repeat,
-                  text:
-                      'Próxima visita: ${dateFormat.format(visit.nextVisitDate!)}',
-                  color: AppTheme.primaryColor,
-                ),
-              ],
-              if (visit.visitAgain &&
-                  visit.nextVisitReason != null &&
-                  visit.nextVisitReason!.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                _InfoRow(
-                  icon: Icons.info_outline,
-                  text: 'Motivo: ${visit.nextVisitReason!}',
-                  color: AppTheme.primaryColor,
-                  maxLines: 2,
-                ),
-              ],
-              const Divider(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () async {
-                      await context.push(AppRouter.editVisit, extra: visit);
-                      if (context.mounted) {
-                        context.read<VisitCubit>().loadVisits();
-                      }
-                    },
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('Editar'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppTheme.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton.icon(
-                    onPressed: () => _showDeleteDialog(context),
-                    icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('Excluir'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.red,
-                    ),
-                  ),
-                ],
+                icon: Icons.notes,
+                text: visit.description,
               ),
             ],
-          ),
+            if (visit.visitAgain && visit.nextVisitDate != null) ...[
+              const SizedBox(height: 4),
+              _InfoRow(
+                icon: Icons.event_repeat,
+                text:
+                    'Próxima visita: ${dateFormat.format(visit.nextVisitDate!)}',
+                color: AppTheme.primaryColor,
+              ),
+            ],
+            if (visit.visitAgain &&
+                visit.nextVisitReason != null &&
+                visit.nextVisitReason!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              _InfoRow(
+                icon: Icons.info_outline,
+                text: 'Motivo: ${visit.nextVisitReason!}',
+                color: AppTheme.primaryColor,
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirmar exclusão'),
-        content: Text(
-          'Deseja excluir a visita de "${visit.visitedPersonName}"?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              context.read<VisitCubit>().deleteVisit(visit.id!);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
   final Color color;
-  final int maxLines;
 
   const _InfoRow({
     required this.icon,
     required this.text,
     this.color = Colors.grey,
-    this.maxLines = 1,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment:
-          maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 6),
@@ -310,7 +256,7 @@ class _InfoRow extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(fontSize: 13, color: color),
-            maxLines: maxLines,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -319,29 +265,3 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _StatusChip({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-        border: Border.all(color: color, width: 1),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}

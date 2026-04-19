@@ -12,31 +12,47 @@ class VisitModel extends Visit {
     super.nextVisitReason,
   });
 
-  factory VisitModel.fromMap(Map<String, dynamic> map) {
+  factory VisitModel.fromApi(Map<String, dynamic> json) {
     return VisitModel(
-      id: map['id'] as int?,
-      visitedPersonName: map['visited_person_name'] as String,
-      visitorName: map['visitor_name'] as String,
-      visitDate: DateTime.parse(map['visit_date'] as String),
-      description: map['description'] as String,
-      visitAgain: (map['visit_again'] as int) == 1,
-      nextVisitDate: map['next_visit_date'] != null
-          ? DateTime.parse(map['next_visit_date'] as String)
+      id: json['id'] as int?,
+      visitedPersonName: json['nome_visitado'] as String,
+      visitorName: json['nome_visitante'] as String,
+      visitDate: DateTime.parse(json['data_visita'] as String),
+      description: json['descricao'] as String,
+      visitAgain: json['visitar_novamente'] as bool? ?? false,
+      nextVisitDate: json['proxima_visita'] != null
+          ? DateTime.parse(json['proxima_visita'] as String)
           : null,
-      nextVisitReason: map['next_visit_reason'] as String?,
+      nextVisitReason: json['motivo_proxima_visita'] as String?,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toApiMap() {
     return {
-      if (id != null) 'id': id,
-      'visited_person_name': visitedPersonName,
-      'visitor_name': visitorName,
-      'visit_date': visitDate.toIso8601String(),
-      'description': description,
-      'visit_again': visitAgain ? 1 : 0,
-      'next_visit_date': nextVisitDate?.toIso8601String(),
-      'next_visit_reason': nextVisitReason,
+      'nome_visitado': visitedPersonName,
+      'nome_visitante': visitorName,
+      'data_visita': visitDate.toIso8601String().split('T').first,
+      'descricao': description,
+      'visitar_novamente': visitAgain,
+      'mostrar_app': true,
+      if (nextVisitDate != null)
+        'proxima_visita': nextVisitDate!.toIso8601String().split('T').first,
+      if (nextVisitReason != null && nextVisitReason!.isNotEmpty)
+        'motivo_proxima_visita': nextVisitReason,
+    };
+  }
+
+  Map<String, dynamic> toEditApiMap() {
+    return {
+      'nome_visitado': visitedPersonName,
+      'nome_visitante': visitorName,
+      'data_visita': visitDate.toIso8601String().split('T').first,
+      'descricao': description,
+      'visitar_novamente': visitAgain,
+      if (nextVisitDate != null)
+        'proxima_visita': nextVisitDate!.toIso8601String().split('T').first,
+      if (nextVisitReason != null && nextVisitReason!.isNotEmpty)
+        'motivo_proxima_visita': nextVisitReason,
     };
   }
 
