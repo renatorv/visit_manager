@@ -15,11 +15,15 @@ class VisitRemoteDataSourceImpl implements VisitRemoteDataSource {
 
   @override
   Future<List<VisitModel>> getAllVisits() async {
-    final response = await dio.get('/visits/ativas');
-    final List<dynamic> data = response.data as List<dynamic>;
-    return data
-        .map((json) => VisitModel.fromApi(json as Map<String, dynamic>))
-        .toList();
+    try {
+      final response = await dio.get('/visits/ativas');
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data
+          .map((json) => VisitModel.fromApi(json as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw Exception(_extractErrorMessage(e));
+    }
   }
 
   @override
@@ -41,6 +45,9 @@ class VisitRemoteDataSourceImpl implements VisitRemoteDataSource {
   }
 
   String _extractErrorMessage(DioException e) {
+    if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout || e.toString().contains('Connection refused')) {
+      return 'Falha ao comunicar com o servidor, por favor tente mais tarde.';
+    }
     if (e.response?.data != null) {
       final data = e.response!.data;
       if (data is Map<String, dynamic> && data.containsKey('detail')) {

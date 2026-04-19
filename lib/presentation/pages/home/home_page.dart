@@ -66,16 +66,34 @@ class _HomeView extends StatelessWidget {
             _ => <Visit>[],
           };
 
+          Widget content;
           if (visits.isEmpty) {
-            return const _EmptyState();
+            content = LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: constraints.maxHeight,
+                  child: const _EmptyState(),
+                ),
+              ),
+            );
+          } else {
+            content = ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: visits.length,
+              itemBuilder: (context, index) {
+                return _VisitCard(visit: visits[index]);
+              },
+            );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: visits.length,
-            itemBuilder: (context, index) {
-              return _VisitCard(visit: visits[index]);
+          return RefreshIndicator(
+            color: AppTheme.primaryColor,
+            onRefresh: () async {
+              await context.read<VisitCubit>().loadVisits();
             },
+            child: content,
           );
         },
       ),

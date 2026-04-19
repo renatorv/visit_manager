@@ -92,10 +92,16 @@ class _VisitFormViewState extends State<_VisitFormView> {
   }
 
   Future<void> _pickVisitDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    DateTime initial = _visitDate ?? today;
+    if (initial.isBefore(today)) initial = today;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _visitDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
+      initialDate: initial,
+      firstDate: today,
       lastDate: DateTime(2100),
       builder: (context, child) => _datePickerTheme(context, child),
     );
@@ -103,10 +109,16 @@ class _VisitFormViewState extends State<_VisitFormView> {
   }
 
   Future<void> _pickNextVisitDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    DateTime initial = _nextVisitDate ?? today.add(const Duration(days: 7));
+    if (initial.isBefore(today)) initial = today;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _nextVisitDate ?? DateTime.now().add(const Duration(days: 7)),
-      firstDate: DateTime.now(),
+      initialDate: initial,
+      firstDate: today,
       lastDate: DateTime(2100),
       builder: (context, child) => _datePickerTheme(context, child),
     );
@@ -134,9 +146,25 @@ class _VisitFormViewState extends State<_VisitFormView> {
       return;
     }
 
-    if (_visitAgain && _nextVisitDate == null) {
-      _showWarning('Por favor, selecione a data da próxima visita.');
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final vDate = DateTime(_visitDate!.year, _visitDate!.month, _visitDate!.day);
+    if (vDate.isBefore(today)) {
+      _showWarning('A data da visita não pode ser anterior a hoje.');
       return;
+    }
+
+    if (_visitAgain) {
+      if (_nextVisitDate == null) {
+        _showWarning('Por favor, selecione a data da próxima visita.');
+        return;
+      }
+      final nDate = DateTime(_nextVisitDate!.year, _nextVisitDate!.month, _nextVisitDate!.day);
+      if (nDate.isBefore(today)) {
+        _showWarning('A data da próxima visita não pode ser anterior a hoje.');
+        return;
+      }
     }
 
     final visit = Visit(
@@ -183,12 +211,19 @@ class _VisitFormViewState extends State<_VisitFormView> {
       body: BlocListener<VisitCubit, VisitState>(
         listener: (context, state) {
           if (state is VisitOperationSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green.shade600,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
             context.pop();
           } else if (state is VisitError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.red.shade600,
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -236,6 +271,7 @@ class _VisitFormViewState extends State<_VisitFormView> {
                   controller: _addressController,
                   label: 'Endereço',
                   icon: Icons.location_on,
+                  maxLines: 2,
                   validator: (v) => (v == null || v.trim().isEmpty)
                       ? 'Informe o endereço'
                       : null,
