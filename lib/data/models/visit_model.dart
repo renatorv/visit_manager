@@ -10,6 +10,8 @@ class VisitModel extends Visit {
     required super.visitAgain,
     super.nextVisitDate,
     super.nextVisitReason,
+    required super.phone,
+    required super.address,
   });
 
   factory VisitModel.fromApi(Map<String, dynamic> json) {
@@ -24,6 +26,8 @@ class VisitModel extends Visit {
           ? DateTime.parse(json['proxima_visita'] as String)
           : null,
       nextVisitReason: json['motivo_proxima_visita'] as String?,
+      phone: json['telefone'] as String? ?? '',
+      address: json['endereco'] as String? ?? '',
     );
   }
 
@@ -39,6 +43,8 @@ class VisitModel extends Visit {
         'proxima_visita': nextVisitDate!.toIso8601String().split('T').first,
       if (nextVisitReason != null && nextVisitReason!.isNotEmpty)
         'motivo_proxima_visita': nextVisitReason,
+      'telefone': phone.replaceAll(RegExp(r'\D'), ''),
+      'endereco': address,
     };
   }
 
@@ -53,6 +59,8 @@ class VisitModel extends Visit {
         'proxima_visita': nextVisitDate!.toIso8601String().split('T').first,
       if (nextVisitReason != null && nextVisitReason!.isNotEmpty)
         'motivo_proxima_visita': nextVisitReason,
+      'telefone': phone.replaceAll(RegExp(r'\D'), ''),
+      'endereco': address,
     };
   }
 
@@ -66,6 +74,8 @@ class VisitModel extends Visit {
       visitAgain: visit.visitAgain,
       nextVisitDate: visit.nextVisitDate,
       nextVisitReason: visit.nextVisitReason,
+      phone: visit.phone,
+      address: visit.address,
     );
   }
 }

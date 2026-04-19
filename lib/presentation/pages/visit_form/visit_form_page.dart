@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +37,8 @@ class _VisitFormViewState extends State<_VisitFormView> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _visitedPersonController;
   late final TextEditingController _visitorController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _addressController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _nextVisitReasonController;
 
@@ -54,6 +57,18 @@ class _VisitFormViewState extends State<_VisitFormView> {
     _visitorController = TextEditingController(
       text: widget.visit?.visitorName ?? '',
     );
+    final initialPhone = widget.visit?.phone ?? '';
+    final formattedPhone = _PhoneInputFormatter().formatEditUpdate(
+      const TextEditingValue(text: ''),
+      TextEditingValue(text: initialPhone),
+    ).text;
+
+    _phoneController = TextEditingController(
+      text: formattedPhone,
+    );
+    _addressController = TextEditingController(
+      text: widget.visit?.address ?? '',
+    );
     _descriptionController = TextEditingController(
       text: widget.visit?.description ?? '',
     );
@@ -69,6 +84,8 @@ class _VisitFormViewState extends State<_VisitFormView> {
   void dispose() {
     _visitedPersonController.dispose();
     _visitorController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
     _descriptionController.dispose();
     _nextVisitReasonController.dispose();
     super.dispose();
@@ -126,6 +143,8 @@ class _VisitFormViewState extends State<_VisitFormView> {
       id: widget.visit?.id,
       visitedPersonName: _visitedPersonController.text.trim(),
       visitorName: _visitorController.text.trim(),
+      phone: _phoneController.text.trim(),
+      address: _addressController.text.trim(),
       visitDate: _visitDate!,
       description: _descriptionController.text.trim(),
       visitAgain: _visitAgain,
@@ -199,6 +218,26 @@ class _VisitFormViewState extends State<_VisitFormView> {
                   icon: Icons.person_outline,
                   validator: (v) => (v == null || v.trim().isEmpty)
                       ? 'Informe o nome do visitante'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _phoneController,
+                  label: 'Telefone',
+                  icon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [_PhoneInputFormatter()],
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Informe o telefone'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _addressController,
+                  label: 'Endereço',
+                  icon: Icons.location_on,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Informe o endereço'
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -299,11 +338,15 @@ class _VisitFormViewState extends State<_VisitFormView> {
     required IconData icon,
     int maxLines = 1,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
+    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       validator: validator,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(
         labelText: label,
@@ -447,6 +490,45 @@ class _VisitAgainToggle extends StatelessWidget {
         activeColor: AppTheme.primaryColor,
         controlAffinity: ListTileControlAffinity.trailing,
       ),
+    );
+  }
+}
+
+class _PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.length < oldValue.text.length) {
+      return newValue;
+    }
+    
+    final text = newValue.text.replaceAll(RegExp(r'\D'), '');
+    
+    if (text.isEmpty) {
+      return newValue.copyWith(
+        text: '',
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    }
+    
+    final buffer = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      if (i == 0) buffer.write('(');
+      if (i == 2) buffer.write(') ');
+      if (i == 3) buffer.write(' ');
+      if (i == 7) buffer.write('-');
+      
+      if (i >= 11) break;
+      
+      buffer.write(text[i]);
+    }
+    
+    final formatted = buffer.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

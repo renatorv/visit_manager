@@ -9,6 +9,8 @@ class Visit extends Equatable {
   final bool visitAgain;
   final DateTime? nextVisitDate;
   final String? nextVisitReason;
+  final String phone;
+  final String address;
 
   const Visit({
     this.id,
@@ -19,6 +21,8 @@ class Visit extends Equatable {
     required this.visitAgain,
     this.nextVisitDate,
     this.nextVisitReason,
+    required this.phone,
+    required this.address,
   });
 
   Visit copyWith({
@@ -30,6 +34,8 @@ class Visit extends Equatable {
     bool? visitAgain,
     DateTime? nextVisitDate,
     String? nextVisitReason,
+    String? phone,
+    String? address,
     bool clearNextVisitDate = false,
     bool clearNextVisitReason = false,
   }) {
@@ -44,6 +50,8 @@ class Visit extends Equatable {
           clearNextVisitDate ? null : (nextVisitDate ?? this.nextVisitDate),
       nextVisitReason:
           clearNextVisitReason ? null : (nextVisitReason ?? this.nextVisitReason),
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
     );
   }
 
@@ -57,5 +65,7 @@ class Visit extends Equatable {
         visitAgain,
         nextVisitDate,
         nextVisitReason,
+        phone,
+        address,
       ];
 }

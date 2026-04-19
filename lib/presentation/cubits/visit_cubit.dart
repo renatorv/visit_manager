@@ -23,27 +23,41 @@ class VisitCubit extends Cubit<VisitState> {
       final visits = await getAllVisitsUseCase();
       emit(VisitLoaded(visits));
     } catch (e) {
-      emit(VisitError(e.toString()));
+      String message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.substring(11);
+      }
+      emit(VisitError(message));
     }
   }
 
   Future<void> addVisit(Visit visit) async {
+    emit(VisitLoading());
     try {
       await addVisitUseCase(visit);
       final visits = await getAllVisitsUseCase();
       emit(VisitOperationSuccess('Visita cadastrada com sucesso!', visits));
     } catch (e) {
-      emit(VisitError(e.toString()));
+      String message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.substring(11);
+      }
+      emit(VisitError(message));
     }
   }
 
   Future<void> updateVisit(Visit visit) async {
+    emit(VisitLoading());
     try {
       await updateVisitUseCase(visit);
       final visits = await getAllVisitsUseCase();
       emit(VisitOperationSuccess('Visita atualizada com sucesso!', visits));
     } catch (e) {
-      emit(VisitError(e.toString()));
+      String message = e.toString();
+      if (message.startsWith('Exception: ')) {
+        message = message.substring(11);
+      }
+      emit(VisitError(message));
     }
   }
 
