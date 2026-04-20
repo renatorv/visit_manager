@@ -167,10 +167,17 @@ class _VisitCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: AppTheme.primaryColor,
                   radius: 20,
-                  child: Icon(Icons.person, color: Colors.white, size: 20),
+                  child: Text(
+                    '${visit.id}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -249,7 +256,6 @@ class _VisitCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _InfoRow extends StatelessWidget {
@@ -282,4 +288,3 @@ class _InfoRow extends StatelessWidget {
     );
   }
 }
-
