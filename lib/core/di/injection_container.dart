@@ -15,7 +15,7 @@ final sl = GetIt.instance;
 Future<void> setupDependencies() async {
   // Dio
   sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(BaseOptions(baseUrl: 'http://127.0.0.1:8000'));
+    final dio = Dio(BaseOptions(baseUrl: 'http://192.168.1.7:8000'));
     dio.interceptors.add(PrettyDioLogger(
       requestHeader: true,
       requestBody: true,
