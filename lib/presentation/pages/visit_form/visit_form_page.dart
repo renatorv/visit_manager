@@ -58,10 +58,12 @@ class _VisitFormViewState extends State<_VisitFormView> {
       text: widget.visit?.visitorName ?? '',
     );
     final initialPhone = widget.visit?.phone ?? '';
-    final formattedPhone = _PhoneInputFormatter().formatEditUpdate(
-      const TextEditingValue(text: ''),
-      TextEditingValue(text: initialPhone),
-    ).text;
+    final formattedPhone = _PhoneInputFormatter()
+        .formatEditUpdate(
+          const TextEditingValue(text: ''),
+          TextEditingValue(text: initialPhone),
+        )
+        .text;
 
     _phoneController = TextEditingController(
       text: formattedPhone,
@@ -94,7 +96,7 @@ class _VisitFormViewState extends State<_VisitFormView> {
   Future<void> _pickVisitDate() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     DateTime initial = _visitDate ?? today;
     if (initial.isBefore(today)) initial = today;
 
@@ -111,7 +113,7 @@ class _VisitFormViewState extends State<_VisitFormView> {
   Future<void> _pickNextVisitDate() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     DateTime initial = _nextVisitDate ?? today.add(const Duration(days: 7));
     if (initial.isBefore(today)) initial = today;
 
@@ -149,7 +151,8 @@ class _VisitFormViewState extends State<_VisitFormView> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    final vDate = DateTime(_visitDate!.year, _visitDate!.month, _visitDate!.day);
+    final vDate =
+        DateTime(_visitDate!.year, _visitDate!.month, _visitDate!.day);
     if (vDate.isBefore(today)) {
       _showWarning('A data da visita não pode ser anterior a hoje.');
       return;
@@ -160,7 +163,8 @@ class _VisitFormViewState extends State<_VisitFormView> {
         _showWarning('Por favor, selecione a data da próxima visita.');
         return;
       }
-      final nDate = DateTime(_nextVisitDate!.year, _nextVisitDate!.month, _nextVisitDate!.day);
+      final nDate = DateTime(
+          _nextVisitDate!.year, _nextVisitDate!.month, _nextVisitDate!.day);
       if (nDate.isBefore(today)) {
         _showWarning('A data da próxima visita não pode ser anterior a hoje.');
         return;
@@ -229,138 +233,139 @@ class _VisitFormViewState extends State<_VisitFormView> {
             );
           }
         },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _SectionHeader(title: 'Dados da Visita'),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _visitedPersonController,
-                  label: 'Nome da pessoa visitada',
-                  icon: Icons.person,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Informe o nome da pessoa visitada'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _visitorController,
-                  label: 'Nome do visitante',
-                  icon: Icons.person_outline,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Informe o nome do visitante'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _phoneController,
-                  label: 'Telefone',
-                  icon: Icons.phone,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [_PhoneInputFormatter()],
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Informe o telefone'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _addressController,
-                  label: 'Endereço',
-                  icon: Icons.location_on,
-                  maxLines: 2,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Informe o endereço'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                _DatePickerField(
-                  label: 'Data da visita',
-                  icon: Icons.calendar_today,
-                  date: _visitDate,
-                  onTap: _pickVisitDate,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _descriptionController,
-                  label: 'Descrição da visita',
-                  icon: Icons.description,
-                  maxLines: 4,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Informe a descrição da visita'
-                      : null,
-                ),
-                const SizedBox(height: 24),
-                const _SectionHeader(title: 'Próxima Visita'),
-                const SizedBox(height: 12),
-                _VisitAgainToggle(
-                  value: _visitAgain,
-                  onChanged: (value) {
-                    setState(() {
-                      _visitAgain = value;
-                      if (!_visitAgain) {
-                        _nextVisitDate = null;
-                        _nextVisitReasonController.clear();
-                      }
-                    });
-                  },
-                ),
-                if (_visitAgain) ...[
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _SectionHeader(title: 'Dados da Visita'),
                   const SizedBox(height: 16),
-                  _DatePickerField(
-                    label: 'Data da próxima visita',
-                    icon: Icons.event_repeat,
-                    date: _nextVisitDate,
-                    onTap: _pickNextVisitDate,
-                    accentColor: AppTheme.primaryColor,
+                  _buildTextField(
+                    controller: _visitedPersonController,
+                    label: 'Nome da pessoa visitada',
+                    icon: Icons.person,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Informe o nome da pessoa visitada'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   _buildTextField(
-                    controller: _nextVisitReasonController,
-                    label: 'Motivo da próxima visita',
-                    icon: Icons.note_alt_outlined,
-                    maxLines: 3,
-                    validator: (v) => (_visitAgain &&
-                            (v == null || v.trim().isEmpty))
-                        ? 'Informe o motivo da próxima visita'
+                    controller: _visitorController,
+                    label: 'Visita realizada por',
+                    icon: Icons.person_outline,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Informe quem realizou a visita'
                         : null,
                   ),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    controller: _phoneController,
+                    label: 'Telefone',
+                    icon: Icons.phone,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [_PhoneInputFormatter()],
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Informe o telefone'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    controller: _addressController,
+                    label: 'Endereço',
+                    icon: Icons.location_on,
+                    maxLines: 2,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Informe o endereço'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  _DatePickerField(
+                    label: 'Data da visita',
+                    icon: Icons.calendar_today,
+                    date: _visitDate,
+                    onTap: _pickVisitDate,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    controller: _descriptionController,
+                    label: 'Descrição da visita',
+                    icon: Icons.description,
+                    maxLines: 4,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Informe a descrição da visita'
+                        : null,
+                  ),
+                  const SizedBox(height: 24),
+                  const _SectionHeader(title: 'Próxima Visita'),
+                  const SizedBox(height: 12),
+                  _VisitAgainToggle(
+                    value: _visitAgain,
+                    onChanged: (value) {
+                      setState(() {
+                        _visitAgain = value;
+                        if (!_visitAgain) {
+                          _nextVisitDate = null;
+                          _nextVisitReasonController.clear();
+                        }
+                      });
+                    },
+                  ),
+                  if (_visitAgain) ...[
+                    const SizedBox(height: 16),
+                    _DatePickerField(
+                      label: 'Data da próxima visita',
+                      icon: Icons.event_repeat,
+                      date: _nextVisitDate,
+                      onTap: _pickNextVisitDate,
+                      accentColor: AppTheme.primaryColor,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      controller: _nextVisitReasonController,
+                      label: 'Motivo da próxima visita',
+                      icon: Icons.note_alt_outlined,
+                      maxLines: 3,
+                      validator: (v) =>
+                          (_visitAgain && (v == null || v.trim().isEmpty))
+                              ? 'Informe o motivo da próxima visita'
+                              : null,
+                    ),
+                  ],
+                  const SizedBox(height: 32),
+                  BlocBuilder<VisitCubit, VisitState>(
+                    builder: (context, state) {
+                      final isLoading = state is VisitLoading;
+                      return SizedBox(
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : _submit,
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  _isEditing
+                                      ? 'Atualizar Visita'
+                                      : 'Cadastrar Visita',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      );
+                    },
+                  ),
                 ],
-                const SizedBox(height: 32),
-                BlocBuilder<VisitCubit, VisitState>(
-                  builder: (context, state) {
-                    final isLoading = state is VisitLoading;
-                    return SizedBox(
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: isLoading ? null : _submit,
-                        child: isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                _isEditing
-                                    ? 'Atualizar Visita'
-                                    : 'Cadastrar Visita',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         ),
@@ -539,28 +544,28 @@ class _PhoneInputFormatter extends TextInputFormatter {
     if (newValue.text.length < oldValue.text.length) {
       return newValue;
     }
-    
+
     final text = newValue.text.replaceAll(RegExp(r'\D'), '');
-    
+
     if (text.isEmpty) {
       return newValue.copyWith(
         text: '',
         selection: const TextSelection.collapsed(offset: 0),
       );
     }
-    
+
     final buffer = StringBuffer();
     for (int i = 0; i < text.length; i++) {
       if (i == 0) buffer.write('(');
       if (i == 2) buffer.write(') ');
       if (i == 3) buffer.write(' ');
       if (i == 7) buffer.write('-');
-      
+
       if (i >= 11) break;
-      
+
       buffer.write(text[i]);
     }
-    
+
     final formatted = buffer.toString();
     return TextEditingValue(
       text: formatted,
